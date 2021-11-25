@@ -71,5 +71,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'org.apache.commons:commons-lang3:3.10'
-    implementation 'us.feras.mdv:markdownview:1.1.0'
+    implementation 'org.markdownj:markdownj-core:0.4'
 }
