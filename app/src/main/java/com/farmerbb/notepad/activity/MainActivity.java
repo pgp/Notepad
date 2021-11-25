@@ -71,13 +71,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import us.feras.mdv.MarkdownView;
 
 public class MainActivity extends NotepadBaseActivity implements
-BackButtonDialogFragment.Listener, 
-DeleteDialogFragment.Listener, 
-SaveButtonDialogFragment.Listener,
-FirstRunDialogFragment.Listener,
-NoteListFragment.Listener,
-NoteEditFragment.Listener, 
-NoteViewFragment.Listener {
+        BackButtonDialogFragment.Listener,
+        DeleteDialogFragment.Listener,
+        SaveButtonDialogFragment.Listener,
+        FirstRunDialogFragment.Listener,
+        NoteListFragment.Listener,
+        NoteEditFragment.Listener,
+        NoteViewFragment.Listener {
 
     Object[] filesToExport;
     Object[] filesToDelete;
@@ -160,11 +160,13 @@ NoteViewFragment.Listener {
         // This fragment shows NoteListFragment in the main screen area (only seen on phones and tablet mode portrait),
         // but only if it doesn't already contain NoteViewFragment or NoteEditFragment.
         // If NoteListFragment is already showing in the sidebar, use WelcomeFragment instead
-        if(!((getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment)
-           || (getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteViewFragment))) {
-            if((getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) == null
+
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(!((frg instanceof NoteEditFragment)
+           || (frg instanceof NoteViewFragment))) {
+            if((frg == null
                && findViewById(R.id.layoutMain).getTag().equals("main-layout-large"))
-               || ((getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteListFragment)
+               || ((frg instanceof NoteListFragment)
                && findViewById(R.id.layoutMain).getTag().equals("main-layout-large")))
                     transaction.replace(R.id.noteViewEdit, new WelcomeFragment(), "NoteListFragment");
             else if(findViewById(R.id.layoutMain).getTag().equals("main-layout-normal"))
@@ -217,17 +219,18 @@ NoteViewFragment.Listener {
     @Override
     public boolean dispatchKeyShortcutEvent(KeyEvent event) {
         super.dispatchKeyShortcutEvent(event);
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
         if(event.getAction() == KeyEvent.ACTION_DOWN && event.isCtrlPressed()) {
-            if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteListFragment) {
+            if(frg instanceof NoteListFragment) {
                 NoteListFragment fragment = (NoteListFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
                 fragment.dispatchKeyShortcutEvent(event.getKeyCode());
-            } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteViewFragment) {
+            } else if(frg instanceof NoteViewFragment) {
                 NoteViewFragment fragment = (NoteViewFragment) getSupportFragmentManager().findFragmentByTag("NoteViewFragment");
                 fragment.dispatchKeyShortcutEvent(event.getKeyCode());
-            } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment) {
+            } else if(frg instanceof NoteEditFragment) {
                 NoteEditFragment fragment = (NoteEditFragment) getSupportFragmentManager().findFragmentByTag("NoteEditFragment");
                 fragment.dispatchKeyShortcutEvent(event.getKeyCode());
-            } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof WelcomeFragment) {
+            } else if(frg instanceof WelcomeFragment) {
                 WelcomeFragment fragment = (WelcomeFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
                 fragment.dispatchKeyShortcutEvent(event.getKeyCode());
             }
@@ -241,10 +244,13 @@ NoteViewFragment.Listener {
     public void onDeleteDialogPositiveClick() {
         if(filesToDelete != null) {
             reallyDeleteNotes();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteViewFragment) {
+            return;
+        }
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(frg instanceof NoteViewFragment) {
             NoteViewFragment fragment = (NoteViewFragment) getSupportFragmentManager().findFragmentByTag("NoteViewFragment");
             fragment.onDeleteDialogPositiveClick();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment) {
+        } else if(frg instanceof NoteEditFragment) {
             NoteEditFragment fragment = (NoteEditFragment) getSupportFragmentManager().findFragmentByTag("NoteEditFragment");
             fragment.onDeleteDialogPositiveClick();
         }
@@ -252,16 +258,17 @@ NoteViewFragment.Listener {
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteListFragment) {
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(frg instanceof NoteListFragment) {
             NoteListFragment fragment = (NoteListFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.onBackPressed();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteViewFragment) {
+        } else if(frg instanceof NoteViewFragment) {
             NoteViewFragment fragment = (NoteViewFragment) getSupportFragmentManager().findFragmentByTag("NoteViewFragment");
             fragment.onBackPressed();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment) {
+        } else if(frg instanceof NoteEditFragment) {
             NoteEditFragment fragment = (NoteEditFragment) getSupportFragmentManager().findFragmentByTag("NoteEditFragment");
             fragment.onBackPressed(null);
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof WelcomeFragment) {
+        } else if(frg instanceof WelcomeFragment) {
             WelcomeFragment fragment = (WelcomeFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.onBackPressed();
         }
@@ -281,11 +288,11 @@ NoteViewFragment.Listener {
     // We need this method in MainActivity because sometimes getSupportFragmentManager() is null
     public void viewEditNote(String filename, boolean isEdit) {
         String currentFilename;
-
-        if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment) {
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(frg instanceof NoteEditFragment) {
             NoteEditFragment fragment = (NoteEditFragment) getSupportFragmentManager().findFragmentByTag("NoteEditFragment");
             currentFilename = fragment.getFilename();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteViewFragment) {
+        } else if(frg instanceof NoteViewFragment) {
             NoteViewFragment fragment = (NoteViewFragment) getSupportFragmentManager().findFragmentByTag("NoteViewFragment");
             currentFilename = fragment.getFilename();
         } else
@@ -295,7 +302,7 @@ NoteViewFragment.Listener {
             if(findViewById(R.id.layoutMain).getTag().equals("main-layout-normal"))
                 cab.clear();
 
-            if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteEditFragment) {
+            if(frg instanceof NoteEditFragment) {
                 NoteEditFragment fragment = (NoteEditFragment) getSupportFragmentManager().findFragmentByTag("NoteEditFragment");
                 fragment.switchNotes(filename);
             } else {
@@ -599,11 +606,11 @@ NoteViewFragment.Listener {
     @Override
     public void showFab() {
         inCabMode = false;
-
-        if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteListFragment) {
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(frg instanceof NoteListFragment) {
             NoteListFragment fragment = (NoteListFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.showFab();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof WelcomeFragment) {
+        } else if(frg instanceof WelcomeFragment) {
             WelcomeFragment fragment = (WelcomeFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.showFab();
         }
@@ -612,11 +619,11 @@ NoteViewFragment.Listener {
     @Override
     public void hideFab() {
         inCabMode = true;
-
-        if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof NoteListFragment) {
+        Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
+        if(frg instanceof NoteListFragment) {
             NoteListFragment fragment = (NoteListFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.hideFab();
-        } else if(getSupportFragmentManager().findFragmentById(R.id.noteViewEdit) instanceof WelcomeFragment) {
+        } else if(frg instanceof WelcomeFragment) {
             WelcomeFragment fragment = (WelcomeFragment) getSupportFragmentManager().findFragmentByTag("NoteListFragment");
             fragment.hideFab();
         }
