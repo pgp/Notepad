@@ -274,9 +274,9 @@ public class NoteViewFragment extends Fragment {
 
         String css = "";
         if(markdownView != null) {
-            String topBottom = " " + Float.toString(getResources().getDimension(R.dimen.padding_top_bottom) / getResources().getDisplayMetrics().density) + "px";
-            String leftRight = " " + Float.toString(getResources().getDimension(R.dimen.padding_left_right) / getResources().getDisplayMetrics().density) + "px";
-            String fontSize = " " + Integer.toString(textSize) + "px";
+            String topBottom = " " + getResources().getDimension(R.dimen.padding_top_bottom) / getResources().getDisplayMetrics().density + "px";
+            String leftRight = " " + getResources().getDimension(R.dimen.padding_left_right) / getResources().getDisplayMetrics().density + "px";
+            String fontSize = " " + textSize + "px";
             String fontColor = " #" + StringUtils.remove(Integer.toHexString(textColor), "ff");
             String linkColor = " #" + StringUtils.remove(Integer.toHexString(new TextView(getActivity()).getLinkTextColors().getDefaultColor()), "ff");
 

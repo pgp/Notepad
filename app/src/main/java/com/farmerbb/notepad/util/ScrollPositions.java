@@ -16,7 +16,7 @@
 package com.farmerbb.notepad.util;
 
 public class ScrollPositions {
-    private static ScrollPositions instance = new ScrollPositions();
+    private static final ScrollPositions instance = new ScrollPositions();
     private int position = 0;
 
     private ScrollPositions() {}

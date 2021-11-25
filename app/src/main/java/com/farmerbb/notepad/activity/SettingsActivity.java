@@ -59,7 +59,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
+    private static final Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
         String stringValue = value.toString();
 
         if(preference instanceof ListPreference) {
@@ -102,7 +102,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                                 ""));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         switch(preference.getKey()) {

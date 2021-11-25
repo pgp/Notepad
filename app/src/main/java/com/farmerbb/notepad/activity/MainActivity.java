@@ -144,7 +144,7 @@ public class MainActivity extends NotepadBaseActivity implements
 
             // Rename any saved drafts from 1.3.x
             File oldDraft = new File(getFilesDir() + File.separator + "draft");
-            File newDraft = new File(getFilesDir() + File.separator + String.valueOf(System.currentTimeMillis()));
+            File newDraft = new File(getFilesDir() + File.separator + System.currentTimeMillis());
 
             if(oldDraft.exists())
                 oldDraft.renameTo(newDraft);
@@ -470,12 +470,15 @@ public class MainActivity extends NotepadBaseActivity implements
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void reallyExportNotes() {
-        String filename = "";
-        String fileSuffix = "";
+        String filename;
+        String fileSuffix;
 
         try {
             filename = loadNoteTitle(filesToExport[fileBeingExported].toString());
-        } catch (IOException e) { /* Gracefully fail */ }
+        }
+        catch (IOException e) {
+            filename = "";
+        }
 
         try {
             fileSuffix = getNoteTimestamp(filesToExport[fileBeingExported].toString());
@@ -797,9 +800,9 @@ public class MainActivity extends NotepadBaseActivity implements
                 break;
         }
 
-        String topBottom = " " + Float.toString(getResources().getDimension(R.dimen.padding_top_bottom_print) / getResources().getDisplayMetrics().density) + "px";
-        String leftRight = " " + Float.toString(getResources().getDimension(R.dimen.padding_left_right_print) / getResources().getDisplayMetrics().density) + "px";
-        String fontSize = " " + Integer.toString(textSize) + "px";
+        String topBottom = " " + getResources().getDimension(R.dimen.padding_top_bottom_print) / getResources().getDisplayMetrics().density + "px";
+        String leftRight = " " + getResources().getDimension(R.dimen.padding_left_right_print) / getResources().getDisplayMetrics().density + "px";
+        String fontSize = " " + textSize + "px";
 
         String css = "body { " +
                         "margin:" + topBottom + topBottom + leftRight + leftRight + "; " +
@@ -830,7 +833,6 @@ public class MainActivity extends NotepadBaseActivity implements
                     "data:text/css;base64," + Base64.encodeToString(css.getBytes(), Base64.DEFAULT));
     }
 
-    @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.KITKAT)
     private void createWebPrintJob(WebView webView) {
         // Get a PrintManager instance

@@ -21,7 +21,7 @@ import android.os.Build;
 import android.webkit.WebView;
 
 public class WebViewInitState {
-    private static WebViewInitState instance = new WebViewInitState();
+    private static final WebViewInitState instance = new WebViewInitState();
     private boolean isInitialized = false;
     
     private WebViewInitState() {}

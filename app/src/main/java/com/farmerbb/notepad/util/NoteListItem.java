@@ -19,8 +19,8 @@ import java.text.Collator;
 import java.util.Comparator;
 
 public class NoteListItem {
-    private String note;
-    private String date;
+    private final String note;
+    private final String date;
 
     public NoteListItem(String note, String date) {
         this.note = note;

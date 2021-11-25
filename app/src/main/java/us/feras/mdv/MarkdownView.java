@@ -1,10 +1,8 @@
 package us.feras.mdv;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 
 import us.feras.mdv.util.HttpHelper;
 
@@ -78,8 +76,7 @@ public class MarkdownView extends WebView {
 
 	private String readFileFromAsset(String fileName){
 		try {
-			InputStream input =  getContext().getAssets().open(fileName);
-			try {
+			try(InputStream input = getContext().getAssets().open(fileName)) {
 				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(input));
 				StringBuilder content = new StringBuilder(input.available());
 				String line;
@@ -88,8 +85,9 @@ public class MarkdownView extends WebView {
 					content.append(System.getProperty("line.separator"));
 				}
 				return content.toString();
-			} finally { input.close(); }
-		} catch (Exception ex){
+			}
+		}
+		catch (Exception ex) {
 			Log.d(TAG, "Error while reading file from assets", ex);
 			return null;
 		}
@@ -101,13 +99,13 @@ public class MarkdownView extends WebView {
 
 		protected String doInBackground(String... params) {
 			try {
-				String markdown = "";
+				String markdown;
 				String url = params[0];
 				this.cssFileUrl = params[1];
 				if(URLUtil.isNetworkUrl(url)){
 					markdown = HttpHelper.get(url).getResponseMessage();
 				} else if (URLUtil.isAssetUrl(url)) {
-					markdown = readFileFromAsset(url.substring("file:///android_asset/".length() , url.length()));
+					markdown = readFileFromAsset(url.substring("file:///android_asset/".length()));
 				} else{
 					throw new IllegalArgumentException("The URL string provided is not a network URL or Asset URL.");
 				}

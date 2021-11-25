@@ -3,11 +3,11 @@ package us.feras.mdv.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -67,12 +67,8 @@ public class HttpHelper {
 		connection.setRequestProperty("Accept-Charset", CHARSET_UTF8);
 		connection.setRequestProperty("Content-Type", "application/"
 				+ contentType);
-		OutputStream output = null;
-		try {
-			output = connection.getOutputStream();
-			output.write(query.getBytes(CHARSET_UTF8));
-		} finally {
-			closeSilently(output);
+		try(OutputStream output = connection.getOutputStream()) {
+			output.write(query.getBytes(StandardCharsets.UTF_8));
 		}
 		return getResponse((HttpURLConnection) connection);
 	}
@@ -94,33 +90,12 @@ public class HttpHelper {
 	/*
 	 * Get the HTTP response message from the server.
 	 */
-	private static String getResponseMessage(InputStream inputStream,
-			HttpURLConnection connection) throws UnsupportedEncodingException,
-			IOException {
-		String responseMessage = null;
-		StringBuffer sb = new StringBuffer();
+	private static String getResponseMessage(InputStream inputStream, HttpURLConnection connection) throws IOException {
+		StringBuilder sb = new StringBuilder();
 		InputStream dis = connection.getInputStream();
 		int chr;
-		while ((chr = dis.read()) != -1) {
-			sb.append((char) chr);
-		}
-		if (sb != null) {
-			responseMessage = sb.toString();
-		}
-		return responseMessage;
-	}
-
-	/*
-	 * Close the connection, if the connection could not be closed (probably
-	 * because its already closed) ignore the error.
-	 */
-	private static void closeSilently(OutputStream output) {
-		if (output != null) {
-			try {
-				output.close();
-			} catch (IOException e) {
-			}
-		}
+		while((chr = dis.read()) != -1) sb.append((char) chr);
+		return sb.toString();
 	}
 
 	public static class Response {

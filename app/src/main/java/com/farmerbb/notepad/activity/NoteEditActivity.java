@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
@@ -127,7 +128,7 @@ String external;
             } else if(Intent.ACTION_VIEW.equals(action) && "text/plain".equals(type)) {
                 try{
                     InputStream in = getContentResolver().openInputStream(intent.getData());
-                    Reader rd = new InputStreamReader(in, "UTF-8");
+                    Reader rd = new InputStreamReader(in, StandardCharsets.UTF_8);
                     char[] buffer = new char[4096];
                     int len;
                     StringBuilder sb = new StringBuilder();
