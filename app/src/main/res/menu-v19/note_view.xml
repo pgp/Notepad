@@ -16,17 +16,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Prev note button -->
+    <item
+        android:id="@+id/action_prev"
+        android:icon="@drawable/ic_arrow_left"
+        app:showAsAction="always"
+        android:title="@string/action_prev"/>
+    <!-- Next note button -->
+    <item
+        android:id="@+id/action_next"
+        android:icon="@drawable/ic_arrow_right"
+        app:showAsAction="always"
+        android:title="@string/action_next"/>
     <!-- Edit button -->
     <item
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_action_edit"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/action_edit"/>
     <!-- Delete button -->
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_action_discard"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="@string/action_delete"/>
     <!-- Share button -->
     <item

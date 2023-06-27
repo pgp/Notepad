@@ -162,12 +162,9 @@ public class MainActivity extends NotepadBaseActivity implements
         // If NoteListFragment is already showing in the sidebar, use WelcomeFragment instead
 
         Fragment frg = getSupportFragmentManager().findFragmentById(R.id.noteViewEdit);
-        if(!((frg instanceof NoteEditFragment)
-           || (frg instanceof NoteViewFragment))) {
-            if((frg == null
-               && findViewById(R.id.layoutMain).getTag().equals("main-layout-large"))
-               || ((frg instanceof NoteListFragment)
-               && findViewById(R.id.layoutMain).getTag().equals("main-layout-large")))
+        if(!(frg instanceof NoteEditFragment || frg instanceof NoteViewFragment)) {
+            if((frg == null && findViewById(R.id.layoutMain).getTag().equals("main-layout-large")) ||
+               (frg instanceof NoteListFragment && findViewById(R.id.layoutMain).getTag().equals("main-layout-large")))
                     transaction.replace(R.id.noteViewEdit, new WelcomeFragment(), "NoteListFragment");
             else if(findViewById(R.id.layoutMain).getTag().equals("main-layout-normal"))
                 transaction.replace(R.id.noteViewEdit, new NoteListFragment(), "NoteListFragment");

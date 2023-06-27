@@ -83,6 +83,8 @@
     <string name="no_notes_to_export">No notes selected to export</string>
     <string name="no_notes_to_delete">No notes selected to delete</string>
     <string name="check_for_updates">Check for Updates</string>
+    <string name="action_prev">Previous</string>
+    <string name="action_next">Next</string>
 
     <string-array name="sort_by_list">
         <item>Date (newest first)</item>

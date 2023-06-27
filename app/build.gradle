@@ -5,7 +5,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.farmerbb.notepad"

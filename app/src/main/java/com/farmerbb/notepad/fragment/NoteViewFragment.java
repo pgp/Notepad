@@ -56,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -463,12 +464,55 @@ public class NoteViewFragment extends Fragment {
         inflater.inflate(R.menu.note_view, menu);
     }
 
+    // null if at the begin of the file list and trying to go left, or at the end and trying to go right
+    // direction: false for left, true for right
+    private String getAdjacentFilename(String currentFilename, boolean direction) {
+        File dir = getContext().getFilesDir();
+        File[] files = dir.listFiles();
+        if(files == null) throw new RuntimeException(); // Guard block: Cannot list contents of private user dir
+        Arrays.sort(files);
+        File prevFile = null;
+        // search using linear scan (performance should degrade only in case of thousands notes)
+        for(int i=0; i<files.length; i++) {
+            if(i>0) prevFile = files[i-1];
+            File curFile = files[i];
+            if(curFile.getName().equals(currentFilename)) {
+                if(direction) { // right
+                    if(i<files.length-1)
+                        return files[i+1].getName();
+                }
+                else { // left
+                    return prevFile == null ? null : prevFile.getName();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+        switch(itemId) {
             case android.R.id.home:
                 // Override default Android "up" behavior to instead mimic the back button
                 getActivity().onBackPressed();
+                return true;
+            case R.id.action_prev:
+            case R.id.action_next:
+                String adjacentFilename = getAdjacentFilename(filename, itemId == R.id.action_next);
+                if(adjacentFilename == null) Toast.makeText(getContext(), "Unable to go to prev/next document (begin/end reached?)", Toast.LENGTH_SHORT).show();
+                else {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("filename", adjacentFilename);
+
+                    Fragment fragment = new NoteViewFragment();
+                    fragment.setArguments(bundle);
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.noteViewEdit, fragment, "NoteViewFragment")
+                            .commit();
+                }
                 return true;
 
                 // Edit button
