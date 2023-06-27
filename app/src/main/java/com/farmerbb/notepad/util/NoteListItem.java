@@ -35,5 +35,10 @@ public class NoteListItem {
         return date;
     }
 
-    public static Comparator<NoteListItem> NoteComparatorTitle = (arg1, arg2) -> Collator.getInstance().compare(arg1.getNote(), arg2.getNote());
+    public static final Comparator<NoteListItem> NoteComparatorTitle = (arg1, arg2) -> Collator.getInstance().compare(arg1.getNote(), arg2.getNote());
+    public static final Comparator<NoteListItem> NoteComparatorTitleReversed = (arg1, arg2) -> Collator.getInstance().compare(arg2.getNote(), arg1.getNote());
+
+    // filename (a.k.a. modification timestamp) comparators
+    public static final Comparator<String> ModTimeComparator = String::compareTo;
+    public static final Comparator<String> ModTimeComparatorReversed = (arg1, arg2) -> arg2.compareTo(arg1);
 }

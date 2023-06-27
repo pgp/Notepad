@@ -324,12 +324,9 @@ public class NoteListFragment extends Fragment {
             listOfNotesByDate[i] = listOfNotes.get(i);
         }
 
-        // If sort-by is "by date", sort in reverse order
-        if(sortBy.startsWith("date")) {
-            Arrays.sort(listOfNotesByDate, Collections.reverseOrder());
-            if(sortBy.endsWith("reversed"))
-                ArrayUtils.reverse(listOfNotesByDate);
-        }
+        // If sort-by is "by date", sort w.r.t. filenames (which actually are unix timestamps)
+        if(sortBy.startsWith("date"))
+            Arrays.sort(listOfNotesByDate, sortBy.endsWith("reversed") ? NoteListItem.ModTimeComparatorReversed : NoteListItem.ModTimeComparator);
 
         // Get array of first lines of each note
         for(int i = 0; i < numOfNotes; i++) {
@@ -348,9 +345,7 @@ public class NoteListFragment extends Fragment {
             System.arraycopy(listOfTitlesByDate, 0, listOfTitlesByName, 0, numOfNotes);
 
             // Sort titles
-            Arrays.sort(listOfTitlesByName, NoteListItem.NoteComparatorTitle);
-            if(sortBy.endsWith("reversed"))
-                ArrayUtils.reverse(listOfTitlesByName);
+            Arrays.sort(listOfTitlesByName, sortBy.endsWith("reversed") ? NoteListItem.NoteComparatorTitleReversed : NoteListItem.NoteComparatorTitle);
 
             // Initialize notes array
             for(int i = 0; i < numOfNotes; i++)
