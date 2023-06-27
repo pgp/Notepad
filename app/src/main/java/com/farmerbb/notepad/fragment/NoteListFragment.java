@@ -353,7 +353,7 @@ public class NoteListFragment extends Fragment {
             // Copy filenames array with new sort order of titles and nullify date arrays
             for(int i = 0; i < numOfNotes; i++) {
                 for(int j = 0; j < numOfNotes; j++) {
-                    if(listOfTitlesByName[i].getNote().equals(listOfTitlesByDate[j].getNote())
+                    if(listOfTitlesByName[i].note.equals(listOfTitlesByDate[j].note)
                             && listOfNotesByName[i].equals("new")) {
                         listOfNotesByName[i] = listOfNotesByDate[j];
                         listOfNotesByDate[j] = "";

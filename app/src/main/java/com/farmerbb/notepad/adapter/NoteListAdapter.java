@@ -41,7 +41,6 @@ public class NoteListAdapter extends BaseNotesAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         NoteListItem item = getItem(position);
-        String note = item.getNote();
 
         // Check if an existing view is being reused, otherwise inflate the view
         if(convertView == null)
@@ -51,7 +50,7 @@ public class NoteListAdapter extends BaseNotesAdapter {
         TextView noteTitle = convertView.findViewById(R.id.noteTitle);
 
         // Populate the data into the template view using the data object
-        noteTitle.setText(note);
+        noteTitle.setText(item.note);
 
         // Apply theme
         SharedPreferences pref = getContext().getSharedPreferences(getContext().getPackageName() + "_preferences", Context.MODE_PRIVATE);

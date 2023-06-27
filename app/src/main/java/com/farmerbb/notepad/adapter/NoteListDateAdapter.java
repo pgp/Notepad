@@ -41,8 +41,6 @@ public class NoteListDateAdapter extends BaseNotesAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         NoteListItem item = getItem(position);
-        String note = item.getNote();
-        String date = item.getDate();
 
         // Check if an existing view is being reused, otherwise inflate the view
         if(convertView == null)
@@ -53,8 +51,8 @@ public class NoteListDateAdapter extends BaseNotesAdapter {
         TextView noteDate = convertView.findViewById(R.id.noteDate);
 
         // Populate the data into the template view using the data object
-        noteTitle.setText(note);
-        noteDate.setText(date);
+        noteTitle.setText(item.note);
+        noteDate.setText(item.date);
 
         // Apply theme
         SharedPreferences pref = getContext().getSharedPreferences(getContext().getPackageName() + "_preferences", Context.MODE_PRIVATE);

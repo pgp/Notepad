@@ -19,8 +19,8 @@ import java.text.Collator;
 import java.util.Comparator;
 
 public class NoteListItem {
-    private final String note;
-    private final String date;
+    public final String note;
+    public final String date;
     public final String filename;
 
     public NoteListItem(String note, String date, String filename) {
@@ -29,16 +29,8 @@ public class NoteListItem {
         this.filename = filename;
     }
 
-    public String getNote() {
-      return note;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public static final Comparator<NoteListItem> NoteComparatorTitle = (arg1, arg2) -> Collator.getInstance().compare(arg1.getNote(), arg2.getNote());
-    public static final Comparator<NoteListItem> NoteComparatorTitleReversed = (arg1, arg2) -> Collator.getInstance().compare(arg2.getNote(), arg1.getNote());
+    public static final Comparator<NoteListItem> NoteComparatorTitle = (arg1, arg2) -> Collator.getInstance().compare(arg1.note, arg2.note);
+    public static final Comparator<NoteListItem> NoteComparatorTitleReversed = (arg1, arg2) -> Collator.getInstance().compare(arg2.note, arg1.note);
 
     // filename (a.k.a. modification timestamp) comparators
     public static final Comparator<String> ModTimeComparator = String::compareTo;
