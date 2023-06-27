@@ -21,10 +21,12 @@ import java.util.Comparator;
 public class NoteListItem {
     private final String note;
     private final String date;
+    public final String filename;
 
-    public NoteListItem(String note, String date) {
+    public NoteListItem(String note, String date, String filename) {
         this.note = note;
         this.date = date;
+        this.filename = filename;
     }
 
     public String getNote() {

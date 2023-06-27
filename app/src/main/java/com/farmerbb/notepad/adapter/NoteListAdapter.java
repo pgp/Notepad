@@ -32,9 +32,9 @@ import java.util.ArrayList;
 
 import androidx.core.content.ContextCompat;
 
-public class NoteListAdapter extends ArrayAdapter<NoteListItem> {
+public class NoteListAdapter extends BaseNotesAdapter {
     public NoteListAdapter(Context context, ArrayList<NoteListItem> notes) {
-        super(context, R.layout.row_layout, notes);
+        super(context, notes);
     }
 
     @Override

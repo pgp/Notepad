@@ -20,13 +20,13 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ActionMode;
@@ -39,12 +39,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.farmerbb.notepad.activity.MainActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.farmerbb.notepad.R;
+import com.farmerbb.notepad.activity.MainActivity;
 import com.farmerbb.notepad.activity.SettingsActivity;
 import com.farmerbb.notepad.adapter.NoteListAdapter;
 import com.farmerbb.notepad.adapter.NoteListDateAdapter;
@@ -53,21 +61,12 @@ import com.farmerbb.notepad.util.NoteListItem;
 import com.farmerbb.notepad.util.ScrollPositions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class NoteListFragment extends Fragment {
 
@@ -331,10 +330,10 @@ public class NoteListFragment extends Fragment {
         // Get array of first lines of each note
         for(int i = 0; i < numOfNotes; i++) {
             try {
-                String title = listener.loadNoteTitle(listOfNotesByDate[i]);
-                String date = listener.loadNoteDate(listOfNotesByDate[i]);
-                listOfTitlesByDate[i] = new NoteListItem(title, date);
-            } catch (IOException e) {
+                String filename = listOfNotesByDate[i];
+                listOfTitlesByDate[i] = new NoteListItem(listener.loadNoteTitle(filename), listener.loadNoteDate(filename), filename);
+            }
+            catch (IOException e) {
                 showToast(R.string.error_loading_list);
             }
         }
@@ -358,14 +357,15 @@ public class NoteListFragment extends Fragment {
                             && listOfNotesByName[i].equals("new")) {
                         listOfNotesByName[i] = listOfNotesByDate[j];
                         listOfNotesByDate[j] = "";
-                        listOfTitlesByDate[j] = new NoteListItem("", "");
+                        listOfTitlesByDate[j] = new NoteListItem("", "", "");
                     }
                 }
             }
 
             // Populate ArrayList with notes, showing name as first line of the notes
             list.addAll(Arrays.asList(listOfTitlesByName));
-        } else if(sortBy.startsWith("date"))
+        }
+        else if(sortBy.startsWith("date"))
             list.addAll(Arrays.asList(listOfTitlesByDate));
 
         // Create the custom adapters to bind the array to the ListView
@@ -373,10 +373,9 @@ public class NoteListFragment extends Fragment {
         final NoteListAdapter adapter = new NoteListAdapter(getActivity(), list);
 
         // Display the ListView
-        if(showDate)
-            listView.setAdapter(dateAdapter);
-        else
-            listView.setAdapter(adapter);
+        MainActivity.listAdapter = showDate ? dateAdapter : adapter;
+        listView.setAdapter(MainActivity.listAdapter);
+        MainActivity.listView = listView;
 
         listView.setSelection(ScrollPositions.getInstance().getPosition());
 
@@ -387,6 +386,7 @@ public class NoteListFragment extends Fragment {
         // Make ListView handle clicked items
         listView.setClickable(true);
         listView.setOnItemClickListener((arg0, arg1, position, arg3) -> {
+            MainActivity.listViewPosition = position;
             ScrollPositions.getInstance().setPosition(listView.getFirstVisiblePosition());
 
             if(sortBy.startsWith("date")) {
@@ -519,8 +519,7 @@ public class NoteListFragment extends Fragment {
 
     // Method used to generate toast notifications
     private void showToast(int message) {
-        Toast toast = Toast.makeText(getActivity(), getResources().getString(message), Toast.LENGTH_SHORT);
-        toast.show();
+        Toast.makeText(getActivity(), getResources().getString(message), Toast.LENGTH_SHORT).show();
     }
 
     public void dispatchKeyShortcutEvent(int keyCode) {

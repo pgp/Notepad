@@ -32,9 +32,9 @@ import java.util.ArrayList;
 
 import androidx.core.content.ContextCompat;
 
-public class NoteListDateAdapter extends ArrayAdapter<NoteListItem> {
+public class NoteListDateAdapter extends BaseNotesAdapter {
     public NoteListDateAdapter(Context context, ArrayList<NoteListItem> notes) {
-        super(context, R.layout.row_layout_date, notes);
+        super(context, notes);
     }
 
     @Override

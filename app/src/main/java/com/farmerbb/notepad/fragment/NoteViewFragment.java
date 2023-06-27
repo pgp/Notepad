@@ -33,6 +33,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -50,13 +51,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.farmerbb.notepad.R;
+import com.farmerbb.notepad.activity.MainActivity;
 import com.farmerbb.notepad.fragment.dialog.FirstViewDialogFragment;
+import com.farmerbb.notepad.util.NoteListItem;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -466,27 +469,12 @@ public class NoteViewFragment extends Fragment {
 
     // null if at the begin of the file list and trying to go left, or at the end and trying to go right
     // direction: false for left, true for right
-    private String getAdjacentFilename(String currentFilename, boolean direction) {
-        File dir = getContext().getFilesDir();
-        File[] files = dir.listFiles();
-        if(files == null) throw new RuntimeException(); // Guard block: Cannot list contents of private user dir
-        Arrays.sort(files);
-        File prevFile = null;
-        // search using linear scan (performance should degrade only in case of thousands notes)
-        for(int i=0; i<files.length; i++) {
-            if(i>0) prevFile = files[i-1];
-            File curFile = files[i];
-            if(curFile.getName().equals(currentFilename)) {
-                if(direction) { // right
-                    if(i<files.length-1)
-                        return files[i+1].getName();
-                }
-                else { // left
-                    return prevFile == null ? null : prevFile.getName();
-                }
-            }
-        }
-        return null;
+    private Pair<Integer, String> getAdjacentFilenameAndPos(boolean direction) {
+        int listViewPos = MainActivity.listViewPosition; // MainActivity.listView.getSelectedItemPosition();
+        ArrayList<NoteListItem> notes = MainActivity.listAdapter.notes;
+        if((listViewPos == 0 && !direction) || (listViewPos == notes.size()-1 && direction)) return null;
+        int newPos = listViewPos + (direction ? 1 : -1);
+        return new Pair<>(newPos, notes.get(newPos).filename);
     }
 
     @Override
@@ -499,11 +487,12 @@ public class NoteViewFragment extends Fragment {
                 return true;
             case R.id.action_prev:
             case R.id.action_next:
-                String adjacentFilename = getAdjacentFilename(filename, itemId == R.id.action_next);
-                if(adjacentFilename == null) Toast.makeText(getContext(), "Unable to go to prev/next document (begin/end reached?)", Toast.LENGTH_SHORT).show();
+                Pair<Integer, String> adjacentFilenameAndPos = getAdjacentFilenameAndPos(itemId == R.id.action_next);
+                if(adjacentFilenameAndPos == null) Toast.makeText(getContext(), "Unable to go to prev/next document (begin/end reached?)", Toast.LENGTH_SHORT).show();
                 else {
+                    MainActivity.listViewPosition = adjacentFilenameAndPos.first;
                     Bundle bundle = new Bundle();
-                    bundle.putString("filename", adjacentFilename);
+                    bundle.putString("filename", adjacentFilenameAndPos.second);
 
                     Fragment fragment = new NoteViewFragment();
                     fragment.setArguments(bundle);

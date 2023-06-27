@@ -18,24 +18,32 @@ package com.farmerbb.notepad.activity;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ClipData;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintManager;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.documentfile.provider.DocumentFile;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.farmerbb.notepad.R;
+import com.farmerbb.notepad.adapter.BaseNotesAdapter;
 import com.farmerbb.notepad.fragment.NoteEditFragment;
 import com.farmerbb.notepad.fragment.NoteListFragment;
 import com.farmerbb.notepad.fragment.NoteViewFragment;
@@ -63,11 +71,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import androidx.documentfile.provider.DocumentFile;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import us.feras.mdv.MarkdownView;
 
 public class MainActivity extends NotepadBaseActivity implements
@@ -90,6 +93,10 @@ public class MainActivity extends NotepadBaseActivity implements
     public static final int IMPORT = 42;
     public static final int EXPORT = 43;
     public static final int EXPORT_TREE = 44;
+
+    public static BaseNotesAdapter listAdapter;
+    public static ListView listView;
+    public static int listViewPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
