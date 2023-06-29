@@ -18,7 +18,6 @@ package com.farmerbb.notepad.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.FileUriExposedException;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -299,17 +297,8 @@ public class NoteViewFragment extends Fragment {
             markdownView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        try {
-                            startActivity(intent);
-                        } catch (ActivityNotFoundException | FileUriExposedException e) { /* Gracefully fail */ }
-                    else
-                        try {
-                            startActivity(intent);
-                        } catch (ActivityNotFoundException e) { /* Gracefully fail */ }
-
+                    try{ startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
+                    catch(Exception e) { /* Gracefully fail */ }
                     return true;
                 }
             });

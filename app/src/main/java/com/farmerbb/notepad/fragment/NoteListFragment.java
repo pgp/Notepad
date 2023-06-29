@@ -374,7 +374,6 @@ public class NoteListFragment extends Fragment {
         // Display the ListView
         MainActivity.listAdapter = showDate ? dateAdapter : adapter;
         listView.setAdapter(MainActivity.listAdapter);
-        MainActivity.listView = listView;
 
         listView.setSelection(ScrollPositions.getInstance().getPosition());
 

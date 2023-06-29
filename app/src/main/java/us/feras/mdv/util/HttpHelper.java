@@ -29,17 +29,16 @@ public class HttpHelper {
 	private static final int DEFULT_CONNECT_TIMEOUT = 5000;
 
 	static public Response get(String url, String query)
-			throws MalformedURLException, IOException {
+			throws IOException {
 		return get(url, query, DEFULT_CONNECT_TIMEOUT, DEFULT_READ_TIMEOUT);
 	}
 
-	static public Response get(String url) throws MalformedURLException,
-			IOException {
+	static public Response get(String url) throws IOException {
 		return get(url, null, DEFULT_CONNECT_TIMEOUT, DEFULT_READ_TIMEOUT);
 	}
 
 	static public Response get(String url, String query, int connectTimeout,
-			int readTimeout) throws MalformedURLException, IOException {
+			int readTimeout) throws IOException {
 		String fullUrl = url;
 		if (query != null && !query.equals("")) {
 			fullUrl += "?" + query;
@@ -51,15 +50,13 @@ public class HttpHelper {
 		return getResponse((HttpURLConnection) connection);
 	}
 
-	static public Response post(String url, String query, String contentType)
-			throws MalformedURLException, IOException {
+	static public Response post(String url, String query, String contentType) throws IOException {
 		return post(url, query, contentType, DEFULT_CONNECT_TIMEOUT,
 				DEFULT_READ_TIMEOUT);
 	}
 
 	static public Response post(String url, String query, String contentType,
-			int connectTimeout, int readTimeout) throws MalformedURLException,
-			IOException {
+			int connectTimeout, int readTimeout) throws IOException {
 		URLConnection connection = new URL(url).openConnection();
 		connection.setReadTimeout(readTimeout);
 		connection.setConnectTimeout(connectTimeout);

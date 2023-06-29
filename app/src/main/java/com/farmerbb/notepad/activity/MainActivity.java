@@ -83,7 +83,7 @@ public class MainActivity extends NotepadBaseActivity implements
         NoteViewFragment.Listener {
 
     Object[] filesToExport;
-    Object[] filesToDelete;
+    String[] filesToDelete;
     int fileBeingExported;
     boolean successful = true;
 
@@ -95,7 +95,6 @@ public class MainActivity extends NotepadBaseActivity implements
     public static final int EXPORT_TREE = 44;
 
     public static BaseNotesAdapter listAdapter;
-    public static ListView listView;
     public static int listViewPosition = -1;
 
     @Override
@@ -187,7 +186,7 @@ public class MainActivity extends NotepadBaseActivity implements
 
             ArrayList<String> filesToDeleteList = savedInstanceState.getStringArrayList("files_to_delete");
             if(filesToDeleteList != null)
-                filesToDelete = filesToDeleteList.toArray();
+                filesToDelete = filesToDeleteList.toArray(new String[0]);
 
             ArrayList<String> savedCab = savedInstanceState.getStringArrayList("cab");
             if(savedCab != null) {
@@ -410,7 +409,7 @@ public class MainActivity extends NotepadBaseActivity implements
 
     @Override
     public void deleteNotes() {
-        filesToDelete = cab.toArray();
+        filesToDelete = cab.toArray(new String[0]);
         cab.clear();
 
         showDeleteDialog(false);
