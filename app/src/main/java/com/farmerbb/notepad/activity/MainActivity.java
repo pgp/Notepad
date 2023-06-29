@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -70,6 +71,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import us.feras.mdv.MarkdownView;
 
@@ -82,7 +85,7 @@ public class MainActivity extends NotepadBaseActivity implements
         NoteEditFragment.Listener,
         NoteViewFragment.Listener {
 
-    Object[] filesToExport;
+    String[] filesToExport;
     String[] filesToDelete;
     int fileBeingExported;
     boolean successful = true;
@@ -93,6 +96,7 @@ public class MainActivity extends NotepadBaseActivity implements
     public static final int IMPORT = 42;
     public static final int EXPORT = 43;
     public static final int EXPORT_TREE = 44;
+    public static final int EXPORT_TREE_ZIP = 45;
 
     public static BaseNotesAdapter listAdapter;
     public static int listViewPosition = -1;
@@ -182,7 +186,7 @@ public class MainActivity extends NotepadBaseActivity implements
         if(savedInstanceState != null) {
             ArrayList<String> filesToExportList = savedInstanceState.getStringArrayList("files_to_export");
             if(filesToExportList != null)
-                filesToExport = filesToExportList.toArray();
+                filesToExport = filesToExportList.toArray(new String[0]);
 
             ArrayList<String> filesToDeleteList = savedInstanceState.getStringArrayList("files_to_delete");
             if(filesToDeleteList != null)
@@ -446,14 +450,35 @@ public class MainActivity extends NotepadBaseActivity implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public void exportNotes() {
-        filesToExport = cab.toArray();
+    public void exportNotes(boolean asZip) {
+        filesToExport = cab.toArray(new String[0]);
         cab.clear();
+        if(asZip) {
+            Intent intent;
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/octet-stream");
+                intent.putExtra(Intent.EXTRA_TITLE, "notes.zip");
+            }
+            else {
+                intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            }
+            try {
+                startActivityForResult(intent, EXPORT_TREE_ZIP);
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+                showToast(R.string.error_exporting_notes);
+            }
+            return;
+        }
 
         if(filesToExport.length == 1 || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             fileBeingExported = 0;
             reallyExportNotes();
-        } else {
+        }
+        else {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
             try {
@@ -466,7 +491,7 @@ public class MainActivity extends NotepadBaseActivity implements
 
     @Override
     public void exportNote(String filename) {
-        filesToExport = new Object[] {filename};
+        filesToExport = new String[] {filename};
         fileBeingExported = 0;
         reallyExportNotes();
     }
@@ -693,7 +718,8 @@ public class MainActivity extends NotepadBaseActivity implements
 
                 File fileToDelete = new File(getFilesDir() + File.separator + "exported_note");
                 fileToDelete.delete();
-            } else if(requestCode == EXPORT_TREE) {
+            }
+            else if(requestCode == EXPORT_TREE) {
                 DocumentFile tree = DocumentFile.fromTreeUri(this, resultData.getData());
 
                 for(Object exportFilename : filesToExport) {
@@ -715,6 +741,25 @@ public class MainActivity extends NotepadBaseActivity implements
 
                 showToast(successful ? R.string.notes_exported_to : R.string.error_exporting_notes);
             }
+            else if(requestCode == EXPORT_TREE_ZIP) {
+                Object zipObj;
+                try {
+                    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+                        zipObj = resultData.getData();
+                    else
+                        zipObj = DocumentFile.fromTreeUri(this, resultData.getData()).createFile(
+                                "application/octet-stream",
+                                "notes"+System.currentTimeMillis()+".zip");
+
+                    saveNotesToZip(zipObj);
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                    successful = false;
+                }
+
+                showToast(successful ? R.string.notes_exported_to : R.string.error_exporting_notes);
+            }
         }
     }
 
@@ -727,6 +772,24 @@ public class MainActivity extends NotepadBaseActivity implements
         OutputStream os = getContentResolver().openOutputStream(uri);
         os.write(note.getBytes());
         os.close();
+    }
+
+    private void saveNotesToZip(Object zipObj) throws IOException {
+        ContentResolver contentResolver = getContentResolver();
+        try(OutputStream os = zipObj instanceof DocumentFile ? contentResolver.openOutputStream(((DocumentFile) zipObj).getUri()) :
+                contentResolver.openOutputStream((Uri) zipObj);
+             ZipOutputStream zos = new ZipOutputStream(os)) {
+            for(String exportFilename : filesToExport) {
+                String zipEntryName = generateFilename(
+                        loadNoteTitle(exportFilename),
+                        getNoteTimestamp(exportFilename));
+                String content = loadNote(exportFilename);
+
+                zos.putNextEntry(new ZipEntry(zipEntryName));
+                byte[] b = content.getBytes();
+                zos.write(b, 0, b.length);
+            }
+        }
     }
 
     private boolean importNote(Uri uri) {

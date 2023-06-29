@@ -19,6 +19,7 @@ package com.farmerbb.notepad.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -93,7 +94,7 @@ public class NoteListFragment extends Fragment {
         void viewNote(String filename);
         void editNote(String filename);
         String getCabString(int size);
-        void exportNotes();
+        void exportNotes(boolean asZip);
         void deleteNotes();
         String loadNoteTitle(String filename) throws IOException;
         String loadNoteDate(String filename);
@@ -420,7 +421,9 @@ public class NoteListFragment extends Fragment {
                     case R.id.action_export:
                         if(cab.size() > 0) {
                             mode.finish(); // Action picked, so close the CAB
-                            listener.exportNotes();
+                            new AlertDialog.Builder(getActivity()).setTitle("Choose export mode")
+                                    .setPositiveButton("Individually", (d,w) -> listener.exportNotes(false))
+                                    .setNegativeButton("As zip", (d,w) -> listener.exportNotes(true)).create().show();
                             return true;
                         } else {
                             showToast(R.string.no_notes_to_export);
