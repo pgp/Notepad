@@ -29,6 +29,13 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -39,17 +46,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.farmerbb.notepad.R;
 import com.farmerbb.notepad.activity.MainActivity;
@@ -59,7 +58,6 @@ import com.farmerbb.notepad.adapter.NoteListDateAdapter;
 import com.farmerbb.notepad.fragment.dialog.AboutDialogFragment;
 import com.farmerbb.notepad.util.NoteListItem;
 import com.farmerbb.notepad.util.ScrollPositions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -67,6 +65,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 public class NoteListFragment extends Fragment {
 

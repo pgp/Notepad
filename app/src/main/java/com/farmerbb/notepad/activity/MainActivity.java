@@ -36,11 +36,11 @@ import android.webkit.WebViewClient;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.documentfile.provider.DocumentFile;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.provider.DocumentFile;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 import com.farmerbb.notepad.R;
 import com.farmerbb.notepad.adapter.BaseNotesAdapter;

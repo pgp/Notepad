@@ -7,8 +7,8 @@ import android.view.Window;
 
 import com.farmerbb.notepad.R;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 
 public abstract class NotepadBaseActivity extends AppCompatActivity {
     @Override
