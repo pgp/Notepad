@@ -31,6 +31,7 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.util.Base64;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -60,11 +61,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,6 +77,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import us.feras.mdv.MarkdownView;
@@ -93,6 +99,7 @@ public class MainActivity extends NotepadBaseActivity implements
     private ArrayList<String> cab = new ArrayList<>();
     private boolean inCabMode = false;
 
+    public static final int IMPORT_ZIP = 41;
     public static final int IMPORT = 42;
     public static final int EXPORT = 43;
     public static final int EXPORT_TREE = 44;
@@ -502,14 +509,14 @@ public class MainActivity extends NotepadBaseActivity implements
         String fileSuffix;
 
         try {
-            filename = loadNoteTitle(filesToExport[fileBeingExported].toString());
+            filename = loadNoteTitle(filesToExport[fileBeingExported]);
         }
         catch (IOException e) {
             filename = "";
         }
 
         try {
-            fileSuffix = getNoteTimestamp(filesToExport[fileBeingExported].toString());
+            fileSuffix = getNoteTimestamp(filesToExport[fileBeingExported]);
         } catch (NumberFormatException e) {
             //For draft notes, get current time
             fileSuffix = getNoteTimestamp(String.valueOf(System.currentTimeMillis()));
@@ -681,12 +688,12 @@ public class MainActivity extends NotepadBaseActivity implements
         if(resultCode == RESULT_OK && resultData != null) {
             successful = true;
 
-            if(requestCode == IMPORT) {
+            if(requestCode == IMPORT || requestCode == IMPORT_ZIP) {
                 Uri uri = resultData.getData();
                 ClipData clipData = resultData.getClipData();
 
                 if(uri != null)
-                    successful = importNote(uri);
+                    successful = requestCode == IMPORT_ZIP ? importNotesFromZip(uri) : importNote(uri);
                 else if(clipData != null)
                     for(int i = 0; i < clipData.getItemCount(); i++) {
                         successful = importNote(clipData.getItemAt(i).getUri());
@@ -703,7 +710,7 @@ public class MainActivity extends NotepadBaseActivity implements
                 LocalBroadcastManager.getInstance(this).sendBroadcast(listNotesIntent);
             } else if(requestCode == EXPORT) {
                 try {
-                    saveExportedNote(loadNote(filesToExport[fileBeingExported].toString()), resultData.getData());
+                    saveExportedNote(loadNote(filesToExport[fileBeingExported]), resultData.getData());
                 } catch (IOException e) {
                     successful = false;
                 }
@@ -816,6 +823,42 @@ public class MainActivity extends NotepadBaseActivity implements
 
             return true;
         } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static void unzip(InputStream is, File targetDir) throws IOException {
+        long prevTiming = -1;
+        try(ZipInputStream zis = new ZipInputStream(is)) {
+            for(ZipEntry ze; (ze = zis.getNextEntry()) != null; ) {
+                if(ze.isDirectory())
+                    Log.e("unzip", "Ignoring nested directory "+ze.getName());
+                else {
+                    // write file content
+                    long filename = System.currentTimeMillis();
+                    if(filename == prevTiming) filename++;
+                    prevTiming = filename;
+                    FileOutputStream fos = new FileOutputStream(new File(targetDir, ""+filename)); // ignore the original file name, just use its content
+                    int len;
+                    byte[] buffer = new byte[1024];
+                    while((len = zis.read(buffer)) > 0)
+                        fos.write(buffer, 0, len);
+                    fos.close();
+                }
+            }
+        }
+    }
+
+    // no need to distinguish between Uri and DocumentFile here, in absence of explicit storage permissions, SAF is required only when writing to external storage
+    private boolean importNotesFromZip(Uri uri) {
+        try {
+            File destDir = getFilesDir();
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            unzip(inputStream, getFilesDir());
+            return true;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

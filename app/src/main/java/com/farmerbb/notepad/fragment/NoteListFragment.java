@@ -20,9 +20,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -87,6 +87,26 @@ public class NoteListFragment extends Fragment {
 
     IntentFilter filter = new IntentFilter("com.farmerbb.notepad.LIST_NOTES");
     ListNotesReceiver receiver = new ListNotesReceiver();
+
+    // import: false, export: true
+    public static AlertDialog getZipAlertDialog(Context context, boolean importOrExport, DialogInterface.OnClickListener listener1,  DialogInterface.OnClickListener listener2) {
+        return new AlertDialog.Builder(context).setTitle("Choose "+(importOrExport ? "export" : "import")+" mode")
+                .setPositiveButton("Individually", listener1)
+                .setNegativeButton("As zip", listener2).create();
+    }
+
+    // forZipImport: false for individual import, true for zip import
+    public static Intent getDocumentPickerIntentForImport(boolean forZipImport) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if(!forZipImport) intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                forZipImport ?
+                        new String[] {"application/octet-stream", "application/zip"} :
+                        new String[] {"text/plain", "text/html", "text/x-markdown"});
+        intent.setType("*/*");
+        return intent;
+    }
 
     /* The activity that creates an instance of this fragment must
  * implement this interface in order to receive event call backs. */
@@ -253,7 +273,6 @@ public class NoteListFragment extends Fragment {
             inflater.inflate(R.menu.main, menu);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
@@ -266,17 +285,27 @@ public class NoteListFragment extends Fragment {
                 startActivity(intentSettings);
                 return true;
             case R.id.action_import:
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"text/plain", "text/html", "text/x-markdown"});
-                intent.setType("*/*");
-
-                try {
-                    getActivity().startActivityForResult(intent, MainActivity.IMPORT);
-                } catch (ActivityNotFoundException e) {
-                    showToast(R.string.error_importing_notes);
-                }
+                getZipAlertDialog(getActivity(), false,
+                        (d,w) -> {
+                            // Individual import
+                            try {
+                                getActivity().startActivityForResult(getDocumentPickerIntentForImport(false), MainActivity.IMPORT);
+                            }
+                            catch(Exception e) {
+                                e.printStackTrace();
+                                showToast(R.string.error_importing_notes);
+                            }
+                        },
+                        (d,w) -> {
+                            // Import from zip
+                            try {
+                                getActivity().startActivityForResult(getDocumentPickerIntentForImport(true), MainActivity.IMPORT_ZIP);
+                            }
+                            catch(Exception e) {
+                                e.printStackTrace();
+                                showToast(R.string.error_importing_notes);
+                            }
+                        }).show();
                 return true;
             case R.id.action_about:
                 DialogFragment aboutFragment = new AboutDialogFragment();
@@ -421,9 +450,7 @@ public class NoteListFragment extends Fragment {
                     case R.id.action_export:
                         if(cab.size() > 0) {
                             mode.finish(); // Action picked, so close the CAB
-                            new AlertDialog.Builder(getActivity()).setTitle("Choose export mode")
-                                    .setPositiveButton("Individually", (d,w) -> listener.exportNotes(false))
-                                    .setNegativeButton("As zip", (d,w) -> listener.exportNotes(true)).create().show();
+                            getZipAlertDialog(getActivity(), true, (d,w) -> listener.exportNotes(false), (d,w) -> listener.exportNotes(true)).show();
                             return true;
                         } else {
                             showToast(R.string.no_notes_to_export);
