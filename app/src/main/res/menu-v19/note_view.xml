@@ -60,5 +60,11 @@
         android:orderInCategory="100"
         app:showAsAction="never"
         android:title="@string/action_print"/>
+    <!-- Details button -->
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="@string/action_details"/>
 
 </menu>

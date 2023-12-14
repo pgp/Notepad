@@ -18,6 +18,7 @@ package com.farmerbb.notepad.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -64,6 +65,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import us.feras.mdv.MarkdownView;
 
@@ -535,6 +537,13 @@ public class NoteViewFragment extends Fragment {
             // Print menu item
             case R.id.action_print:
                 listener.printNote(contentsOnLoad);
+                return true;
+
+            // Show details (filename a.k.a. last modified date)
+            case R.id.action_details:
+                new AlertDialog.Builder(getActivity()).setTitle(R.string.action_details).setMessage(
+                        "Last modified:\n"+new Date(Long.parseLong(filename))+
+                        "\nSize:\n"+contentsOnLoad.length()).create().show();
                 return true;
 
             default:

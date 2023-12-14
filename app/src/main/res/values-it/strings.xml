@@ -76,6 +76,7 @@
     <string name="pref_title_direct_edit">Modifica note direttamente</string>
     <string name="pref_title_markdown">Supporto Markdown/HTML</string>
     <string name="action_print">Stampa</string>
+    <string name="action_details">Dettagli</string>
     <string name="action_start_selection">Seleziona note</string>
     <string name="action_select_all">Seleziona tutte</string>
     <string name="no_notes_to_select">Nessuna nota da selezionare</string>
