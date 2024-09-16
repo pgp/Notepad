@@ -381,6 +381,9 @@ public class NoteEditFragment extends Fragment {
                 getActivity().onBackPressed();
                 return true;
 
+            case R.id.action_discard:
+                onSaveDialogNegativeClick();
+                return true;
                 // Save button
             case R.id.action_save:
                 // Get current note contents from EditText

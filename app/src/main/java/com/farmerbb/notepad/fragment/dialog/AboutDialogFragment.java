@@ -50,7 +50,7 @@ public class AboutDialogFragment extends DialogFragment {
         .setPositiveButton(R.string.action_close, null);
 
         textView = view.findViewById(R.id.dialogMessage);
-        textView.setText(getString(R.string.dialog_about_message, 2020) + "\nMod version by PGP: 2023-12-14");
+        textView.setText(getString(R.string.dialog_about_message, 2020) + "\nMod version by PGP: 2024-09-16");
         textView.setMovementMethod(LinkMovementMethod.getInstance());
 
         return builder.create();
